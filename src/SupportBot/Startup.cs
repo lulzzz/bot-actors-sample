@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Bot.Builder.Adapters;
 using Akka.Actor;
 using SupportBot.Actors;
+using Microsoft.Bot.Builder.Ai;
 
 namespace SupportBot
 {
@@ -26,7 +27,12 @@ namespace SupportBot
             {
                 var adapter = new BotFrameworkAdapter(Configuration);
 
-                //TODO: Include additional middleware here.
+                // NOTICE: The keys and app IDs are stored as user secrets. Please follow the guide
+                // at https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?tabs=visual-studio
+                // to set them up.
+
+                adapter.Use(new LuisRecognizerMiddleware(Configuration["Luis:AppId"], Configuration["Luis:Key"], Configuration["Luis:Url"]));
+                adapter.Use(new QnAMakerMiddleware(Configuration.GetSection("QnaMaker").Get<QnAMakerMiddlewareOptions>()));
 
                 return adapter;
             });
