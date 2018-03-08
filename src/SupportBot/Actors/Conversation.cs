@@ -53,6 +53,11 @@ namespace SupportBot.Actors
                 var request = state.FsmEvent as ChatBotRequest;
                 var activity = (Activity)request.UserRequest;
 
+                if(activity.Type != ActivityTypes.Message)
+                {
+                    return Stay();
+                }
+
                 Sender.Tell(new ChatBotResponse(new[]
                 {
                     activity.CreateReply("Oh um, I had too much coffee or too little coffee. Either way, I have no idea what to do here.")
