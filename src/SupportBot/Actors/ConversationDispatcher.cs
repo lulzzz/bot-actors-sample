@@ -20,7 +20,7 @@ namespace SupportBot.Actors
 
             if(conversationRef.IsNobody())
             {
-                conversationRef = Context.ActorOf(Props.Create<Conversation>(activity.Conversation.Id));
+                conversationRef = Context.ActorOf(Props.Create<Conversation>(activity.Conversation.Id), activity.Conversation.Id);
             }
 
             conversationRef.Forward(activity);
