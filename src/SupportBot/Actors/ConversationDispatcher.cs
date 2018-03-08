@@ -1,5 +1,6 @@
 ﻿using Akka.Actor;
 using Microsoft.Bot.Schema;
+using SupportBot.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,19 +12,20 @@ namespace SupportBot.Actors
     {
         public ConversationDispatcher()
         {
-            Receive<Activity>(HandleMessage);
+            Receive<ChatBotRequest>(HandleMessage);
         }
 
-        private bool HandleMessage(Activity activity)
+        private bool HandleMessage(ChatBotRequest request)
         {
-            var conversationRef = Context.Child(activity.Conversation.Id);
+            var conversationRef = Context.Child(request.UserRequest.Conversation.Id);
+            var activity = request.UserRequest;
 
             if(conversationRef.IsNobody())
             {
                 conversationRef = Context.ActorOf(Props.Create<Conversation>(activity.Conversation.Id), activity.Conversation.Id);
             }
 
-            conversationRef.Forward(activity);
+            conversationRef.Forward(request);
 
             return true;
         }

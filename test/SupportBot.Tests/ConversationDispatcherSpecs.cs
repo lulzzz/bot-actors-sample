@@ -3,6 +3,7 @@ using Akka.TestKit;
 using Akka.TestKit.Xunit2;
 using Microsoft.Bot.Schema;
 using SupportBot.Actors;
+using SupportBot.Messages;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -55,7 +56,7 @@ namespace SupportBot.Tests
         protected IActorRef Dispatcher => _dispatcherRef;
     }
 
-    public class WhenConversingWithBot: BehavesLikeDispatcher
+    public class WhenConversingWithBot : BehavesLikeDispatcher
     {
         [Fact]
         public void ConversationFlowHappensBetweenUserAndBot()
@@ -63,13 +64,13 @@ namespace SupportBot.Tests
             var conversationId = Guid.NewGuid().ToString();
             var testProbe = CreateTestProbe(Sys);
 
-            Dispatcher.Tell(CreateConversationUpdate(conversationId), testProbe);
-            
-            testProbe.ExpectMsg<Activity[]>(TimeSpan.FromMilliseconds(100));
+            Dispatcher.Tell(new ChatBotRequest(CreateConversationUpdate(conversationId), null, new IActivity[] { }), testProbe);
 
-            Dispatcher.Tell(CreateMessage(conversationId, "test message"), testProbe);
+            testProbe.ExpectMsg<ChatBotResponse>(TimeSpan.FromMilliseconds(100));
 
-            testProbe.ExpectMsg<Activity[]>(TimeSpan.FromMilliseconds(100));
+            Dispatcher.Tell(new ChatBotRequest(CreateMessage(conversationId, "test message"), null,new IActivity[] { }), testProbe);
+
+            testProbe.ExpectMsg<ChatBotResponse>(TimeSpan.FromMilliseconds(100));
         }
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.Bot.Builder.Adapters;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
 using SupportBot.Actors;
+using SupportBot.Messages;
 
 namespace SupportBot
 {
@@ -29,10 +30,10 @@ namespace SupportBot
 
         private async Task ReceiveCallback(IBotContext context)
         {
-            var response = await _conversationDispatcherProvider.Value.Ask(context.Request);
-            var activities = (Activity[])response;
-
-            foreach(var activity in activities)
+            var chatBotRequest = new ChatBotRequest(context.Request, context.TopIntent, context.Responses);
+            var result = await _conversationDispatcherProvider.Value.Ask<ChatBotResponse>(chatBotRequest);
+            
+            foreach(var activity in result.Responses)
             {
                 context.Reply(activity);
             }

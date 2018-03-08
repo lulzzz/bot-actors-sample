@@ -6,6 +6,7 @@ using Akka.TestKit;
 using Akka.Actor;
 using System.Threading.Tasks;
 using Microsoft.Bot.Schema;
+using SupportBot.Messages;
 
 namespace SupportBot.Tests
 {
@@ -63,7 +64,7 @@ namespace SupportBot.Tests
             var conversationUpdate = CreateConversationUpdate();
 
             Conversation.SetState(ConversationState.Initial);
-            Conversation.Tell(conversationUpdate);
+            Conversation.Tell(new ChatBotRequest(conversationUpdate, null, new IActivity[] { }));
 
             Assert.Equal(ConversationState.WaitingForUserRequest, Conversation.StateName);
         }
@@ -75,9 +76,9 @@ namespace SupportBot.Tests
             var conversationUpdate = CreateConversationUpdate();
 
             Conversation.SetState(ConversationState.Initial);
-            Conversation.Tell(conversationUpdate, responseProbe.Ref);
+            Conversation.Tell(new ChatBotRequest(conversationUpdate, null, new IActivity[] { } ), responseProbe.Ref);
 
-            responseProbe.ExpectMsg<Activity[]>(TimeSpan.FromMilliseconds(100));
+            responseProbe.ExpectMsg<ChatBotResponse>(TimeSpan.FromMilliseconds(100));
         }
     }
 
@@ -89,16 +90,16 @@ namespace SupportBot.Tests
             var responseProbe = CreateTestProbe();
 
             Conversation.SetState(ConversationState.WaitingForUserRequest);
-            Conversation.Tell(CreateMessage("Test message"), responseProbe.Ref);
+            Conversation.Tell(new ChatBotRequest(CreateMessage("Test message"), null, new IActivity[] { }), responseProbe.Ref);
 
-            responseProbe.ExpectMsg<Activity[]>(TimeSpan.FromMilliseconds(100));
+            responseProbe.ExpectMsg<ChatBotResponse>(TimeSpan.FromMilliseconds(100));
         }
 
         [Fact]
         public void WhenReceivesUserMessageRemainsInWaitingForUserRequestState()
         {
             Conversation.SetState(ConversationState.WaitingForUserRequest);
-            Conversation.Tell(CreateMessage("Test message"));
+            Conversation.Tell(new ChatBotRequest(CreateMessage("Test message"), null, new IActivity[] { }));
 
             Assert.Equal(ConversationState.WaitingForUserRequest, Conversation.StateName);
         }

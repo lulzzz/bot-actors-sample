@@ -1,9 +1,6 @@
 ﻿using Akka.Actor;
 using Microsoft.Bot.Schema;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using SupportBot.Messages;
 
 namespace SupportBot.Actors
 {
@@ -28,7 +25,8 @@ namespace SupportBot.Actors
 
             When(ConversationState.Initial, state =>
             {
-                var activity = state.FsmEvent as Activity;
+                var request = state.FsmEvent as ChatBotRequest;
+                var activity = (Activity)request.UserRequest;
 
                 if (activity.Type == ActivityTypes.ConversationUpdate)
                 {
@@ -36,11 +34,11 @@ namespace SupportBot.Actors
                     {
                         if (member.Id == activity.Recipient.Id)
                         {
-                            Sender.Tell(new []
+                            Sender.Tell(new ChatBotResponse(new[]
                             {
                                 activity.CreateReply("Hey, I'm the new HR bot. You ca ask me anything about HR related stuff."),
                                 activity.CreateReply("How can I help you today?")
-                            });
+                            }));
                         }
                     }
 
@@ -52,12 +50,13 @@ namespace SupportBot.Actors
 
             When(ConversationState.WaitingForUserRequest, state =>
             {
-                var activity = state.FsmEvent as Activity;
+                var request = state.FsmEvent as ChatBotRequest;
+                var activity = (Activity)request.UserRequest;
 
-                Sender.Tell(new []
+                Sender.Tell(new ChatBotResponse(new[]
                 {
                     activity.CreateReply("Oh um, I had too much coffee or too little coffee. Either way, I have no idea what to do here.")
-                });
+                }));
 
                 return Stay().Using(state.StateData);
             });
