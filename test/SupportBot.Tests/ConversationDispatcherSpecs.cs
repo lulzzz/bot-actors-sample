@@ -55,7 +55,7 @@ namespace SupportBot.Tests
         protected IActorRef Dispatcher => _dispatcherRef;
     }
 
-    public class WhenConversingAllMessagesAreDeliveredToTheSameConversation : BehavesLikeDispatcher
+    public class WhenConversingWithBot: BehavesLikeDispatcher
     {
         [Fact]
         public void ConversationFlowHappensBetweenUserAndBot()
